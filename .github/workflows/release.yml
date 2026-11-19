@@ -1,0 +1,50 @@
+name: release
+# Publishes the five npm packages when a tag vX.Y.Z is pushed. Trusted publishing: npm accepts this workflow's OIDC
+# identity (CrewRiz/catalyst-q, release.yml), so no token is stored anywhere, and each package carries provenance.
+# Before tagging, run the IP gate locally (RELEASING.md); it is not run here because public logs would print its matches.
+on:
+  push:
+    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+permissions:
+  id-token: write
+  contents: read
+concurrency:
+  group: npm-release
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest   # trusted publishing needs a GitHub-hosted runner
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - name: npm 11.5.1 or later (trusted publishing)
+        run: npm install -g npm@11 && npm --version
+      - name: tag must match every package version
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          for d in sdk advisor ui cli mcp; do
+            p="$(node -p "require('./packages/$d/package.json').version")"
+            [ "$p" = "$v" ] || { echo "packages/$d is $p, tag is $GITHUB_REF_NAME"; exit 1; }
+          done
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - name: npm publish, dependencies first (skips a version npm already has)
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          for w in catalyst-q catalyst-q-advisor catalyst-q-ui catalyst-q-cli catalyst-q-mcp; do
+            if npm view "$w@$v" version >/dev/null 2>&1; then echo "$w@$v is already on npm"; continue; fi
+            npm publish -w "$w" --access public
+          done
+      - name: what a stranger gets
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          mkdir -p "$RUNNER_TEMP/stranger" && cd "$RUNNER_TEMP/stranger" && npm init -y >/dev/null
+          for i in $(seq 1 20); do npm view "catalyst-q-mcp@$v" version >/dev/null 2>&1 && break; sleep 15; done
+          npm install "catalyst-q@$v" "catalyst-q-cli@$v" "catalyst-q-mcp@$v"
+          node -e 'const m=require("catalyst-q"); if (typeof m.CatalystQ !== "function") process.exit(1); console.log("catalyst-q loads")'

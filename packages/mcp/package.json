@@ -7,7 +7,7 @@
   "homepage": "https://catalyst-q.strategic-innovations.ai",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/t-crew/catalyst-q.git",
+    "url": "git+https://github.com/CrewRiz/catalyst-q.git",
     "directory": "packages/mcp"
   },
   "keywords": [

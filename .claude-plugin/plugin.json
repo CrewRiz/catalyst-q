@@ -6,7 +6,7 @@
     "name": "Travis Crew"
   },
   "homepage": "https://catalyst-q.strategic-innovations.ai",
-  "repository": "https://github.com/t-crew/catalyst-q",
+  "repository": "https://github.com/CrewRiz/catalyst-q",
   "license": "MIT",
   "keywords": ["quantum", "openqasm", "qec", "qaoa", "vqe", "mcp"]
 }
