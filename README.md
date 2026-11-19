@@ -95,10 +95,10 @@ claude mcp add catalyst-q -- npx -y catalyst-q-mcp
 **Agent skill.** [skills/catalyst-q/SKILL.md](skills/catalyst-q/SKILL.md) tells an agent to run the advisor before anything else. The repo is also a plugin for Claude Code and Codex:
 
 ```sh
-claude plugin marketplace add t-crew/catalyst-q
+claude plugin marketplace add CrewRiz/catalyst-q
 claude plugin install catalyst-q@catalyst-q
 
-codex plugin marketplace add t-crew/catalyst-q
+codex plugin marketplace add CrewRiz/catalyst-q
 codex plugin add catalyst-q@catalyst-q
 ```
 
@@ -108,7 +108,7 @@ The Action runs the `.qasm` files a pull request changes and writes the results 
 
 ```yaml
 - uses: actions/checkout@v7
-- uses: t-crew/catalyst-q/action@v1
+- uses: CrewRiz/catalyst-q/action@v1
 ```
 
 ## On your desktop
